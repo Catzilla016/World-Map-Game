@@ -1,126 +1,147 @@
 import tkinter as tk
 import json
 
-WIDTH = 1400
-HEIGHT = 800
+class game():
+    def __init__(self):
+        self.WIDTH = 1400
+        self.HEIGHT = 800
+        self.self.root = tk.Tk()
+        self.canvas = tk.Canvas(
+            self.root,
+            width=self.WIDTH,
+            height=self.HEIGHT,
+            bg="lightblue"
+            )
 
-root = tk.Tk()
+    def main(self):
+        #Load the JSON
+        with open("game/Game_Files/mapJSON.json", "r", encoding="utf-8") as f:
+            world = json.load(f)
 
-canvas = tk.Canvas(
-    root,
-    width=WIDTH,
-    height=HEIGHT,
-    bg="lightblue"
-)
+        # Stores all polygon IDs for each country
+        country_shapes = {}
 
-canvas.pack()
+        for feature in self.world["features"]:
+            self.draw_country(feature)
 
-# Load GeoJSON
-with open("game/Game_Files/mapJSON.json", "r", encoding="utf-8") as f:
-    world = json.load(f)
+        self.fill_country("Zambia", "red")
+        self.fill_country("Germany", "blue")
+        self.fill_country("Guatemala", "green")
 
-# Stores all polygon IDs for each country
-country_shapes = {}
+        self.root.mainloop()
 
-def project(lon, lat):
-    """
-    Convert longitude/latitude into screen coordinates
+    def project(self, lon, lat):
+        """
+        Convert longitude/latitude into screen coordinates
 
-    Args:
-        lon (int): the longitude coordinate
-        lat (int): the latitude coordinate
-    
-    Returns:
-        x (int): x coordinate to draw on the map
-        y (int): y coordinate to draw on the map
-    """
+        Args:
+            lon (int): the longitude coordinate
+            lat (int): the latitude coordinate
+        
+        Returns:
+            x (int): x coordinate to draw on the map
+            y (int): y coordinate to draw on the map
+        """
 
-    x = (lon + 180) * (WIDTH / 360)
+        x = (lon + 180) * (self.WIDTH / 360)
 
-    y = (90 - lat) * (HEIGHT / 180)
+        y = (90 - lat) * (self.HEIGHT / 180)
 
-    return x, y
+        return x, y
 
 
-def draw_country(feature):
-    """
-    
-    """
+    def draw_country(self, feature):
+        """
+        Draws the country based on the feature type.
+        If the feature is Polygon, then the coordinates of 
+        the country are passed into the draw function.
+        Else, the entire polygon is passed.
+        
+        Args:
+            feature (dict): the features of the specifies country
+        
+        Returns:
+            None
+        """
 
-    geometry = feature["geometry"]
+        geometry = feature["geometry"]
 
-    country_name = feature["properties"]["name"]
+        country_name = feature["properties"]["name"]
 
-    country_shapes[country_name] = []
+        self.country_shapes[country_name] = []
 
-    if geometry["type"] == "Polygon":
+        if geometry["type"] == "Polygon":
 
-        draw_polygon(
-            geometry["coordinates"],
-            country_name
-        )
-
-    elif geometry["type"] == "MultiPolygon":
-
-        for polygon in geometry["coordinates"]:
-
-            draw_polygon(
-                polygon,
+            self.draw_polygon(
+                geometry["coordinates"],
                 country_name
             )
 
+        elif geometry["type"] == "MultiPolygon":
 
-def draw_polygon(coords, country_name):
+            for polygon in geometry["coordinates"]:
 
-    for ring in coords:
-
-        points = []
-
-        for lon, lat in ring:
-
-            x, y = project(lon, lat)
-
-            points.extend([x, y])
-
-        if len(points) >= 6:
-
-            shape_id = canvas.create_polygon(
-                points,
-                fill="lightgray",
-                outline="black",
-                width=1
-            )
-
-            country_shapes[country_name].append(shape_id)
+                self.draw_polygon(
+                    polygon,
+                    country_name
+                )
 
 
-def fill_country(country_name, color):
-    """
-    Fills the colour of the country specified
+    def draw_polygon(self, coords, country_name):
+        """
+        Append the coordinates and the corresponding 
+        country name into country_shapes.
 
-    Args:
-        country_name (str): the name of the country
-        color (str): the desired color of the country
+        Args:
+            coords (list): list of coordinates of each point to draw
+            country_name (str): name of the coutry
+        
+        Return:
+            None
+        """
+
+        for ring in coords:
+
+            points = []
+
+            for lon, lat in ring:
+
+                x, y = self.project(lon, lat)
+
+                points.extend([x, y])
+
+            if len(points) >= 6:
+
+                shape_id = self.canvas.create_polygon(
+                    points,
+                    fill="lightgray",
+                    outline="black",
+                    width=1
+                )
+
+                self.country_shapes[country_name].append(shape_id)
+
+
+    def fill_country(self, country_name, color):
+        """
+        Fills the colour of the country specified
+
+        Args:
+            country_name (str): the name of the country
+            color (str): the desired color of the country
+        
+        Returns:
+            None
+        """
+
+        if country_name in self.country_shapes:
+
+            for shape_id in self.country_shapes[country_name]:
+
+                self.canvas.itemconfig(
+                    shape_id,
+                    fill=color
+                )
     
-    Returns:
-        None
-    """
 
-    if country_name in country_shapes:
-
-        for shape_id in country_shapes[country_name]:
-
-            canvas.itemconfig(
-                shape_id,
-                fill=color
-            )
-
-for feature in world["features"]:
-
-    draw_country(feature)
-
-fill_country("Zambia", "red")
-fill_country("Germany", "blue")
-fill_country("Guatemala", "green")
-
-root.mainloop()
+    
