@@ -2,20 +2,34 @@ import tkinter as tk
 import json
 import difflib
 
-class gameMode1():
-    def __init__(self):
+class GameMode1(tk.Frame):
+    def __init__(self, parent, app):
+
+        super().__init__(parent)
+
+        self.app = app
+
         self.WIDTH = 1400
         self.HEIGHT = 800
-        self.root = tk.Tk()
-        self.button = tk.Button(self.root, text="Submit", width=25, command=self.on_button_click)
-        self.entry = tk.Entry(self.root)
-        self.label = tk.Label(self.root, text='')
+
+        self.button = tk.Button(
+            self,
+            text="Submit",
+            width=25,
+            command=self.on_button_click
+        )
+
+        self.entry = tk.Entry(self)
+
+        self.label = tk.Label(self, text="")
+
         self.canvas = tk.Canvas(
-            self.root,
+            self,
             width=self.WIDTH,
             height=self.HEIGHT,
             bg="lightblue"
-            )
+        )
+
         self.country_names =['Afghanistan',
         'Albania',
         'Algeria',
@@ -203,7 +217,7 @@ class gameMode1():
         'Ukraine',
         'United Arab Emirates',
         'United Kingdom',
-        'United States of America',
+        'USA',
         'Uruguay',
         'Uzbekistan',
         'Vanuatu',
@@ -230,7 +244,31 @@ class gameMode1():
             "St. Vin. and Gren.": "St. Vincent and the Grenadines",
             "São Tomé and Principe": "Sao Tome and Principe",
             "Solomon Is.": "Solomon Islands",
-            "S. Sudan": "South Sudan"
+            "S. Sudan": "South Sudan",
+            "United States of America" : "USA"
+        }
+        
+        #TODO ADD MORE ALIASES!!!!
+        self.aliases = {
+            "usa": "USA",
+            "united states": "USA",
+            "united states of america": "USA",
+            "america": "USA",
+
+            "uk": "United Kingdom",
+            "britain": "United Kingdom",
+            "great britain": "United Kingdom",
+
+            "south korea": "South Korea",
+            "north korea": "North Korea",
+
+            "ivory coast": "Cote d'Ivoire",
+
+            "dr congo": "Dem. Rep. Congo",
+            "democratic republic of the congo": "Dem. Rep. Congo",
+            "drc": "Dem. Rep. Congo", 
+
+            "uae": "United Arab Emirates"
         }
         
         self.country_dots = {}
@@ -252,7 +290,7 @@ class gameMode1():
             self.draw_country(feature)
             
             x = (feature["properties"]["label_x"] + 180) * (self.WIDTH / 360)
-            y = (90 - feature["properties"]["label_y"]) * (self.HEIGHT / 180) 
+            y = (90 - feature["properties"]["label_y"]) * (self.HEIGHT / 180)
 
             dot_id = self.canvas.create_oval(
                 x - 2, y - 2,
@@ -268,13 +306,9 @@ class gameMode1():
                 original_name
             )
 
-            country_name = feature["properties"]["name"]
-
             self.country_dots[country_name] = dot_id
         
-        self.root.bind("<Return>", self.on_button_click)
-
-        self.root.mainloop()
+        self.bind("<Return>", self.on_button_click)
             
 
     def project(self, lon, lat):
@@ -396,29 +430,32 @@ class gameMode1():
                 )
     
 
-    def on_button_click(self):
-        country_name = self.entry.get()
+    def on_button_click(self, event=None):
+        country_name = self.entry.get().strip()
 
-        for feature in self.world["features"]:
-            original_name = feature["properties"]["name"]
+        lookup_name = country_name.lower()
 
-            country_name = self.name_map.get(
-                original_name,
-                original_name
-            )
+        country_name = self.aliases.get(
+            lookup_name,
+            country_name
+        )
+        
+        country_name = country_name[0].upper() + country_name[1:]
 
-        #Exact match
+        # Exact match
         if country_name in self.country_names:
+
             self.fill_country(country_name, "red")
 
             self.canvas.itemconfig(
-            self.country_dots[country_name],
-            fill="green"
-)
+                self.country_dots[country_name],
+                fill="green"
+            )
+
             self.label.config(text="")
             print(country_name)
-        
-        #Close matches
+
+        # Close matches
         else:
             matches = difflib.get_close_matches(
                 country_name,
@@ -429,6 +466,7 @@ class gameMode1():
 
             if matches:
                 corrected_name = matches[0]
+
                 self.label.config(
                     text=f"Did you mean '{corrected_name}'?"
                 )
@@ -440,5 +478,5 @@ class gameMode1():
 
         self.entry.delete(0, tk.END)
 
-game_instance = gameMode1()
-game_instance.main()
+
+        
