@@ -273,6 +273,7 @@ class GameMode1(tk.Frame):
         
         self.country_dots = {}
 
+
     def main(self):
         self.canvas.pack()
         self.button.pack()
@@ -280,7 +281,7 @@ class GameMode1(tk.Frame):
         self.label.pack()
 
         #Load the JSON
-        with open("game/Game_Files/cleaned_world.json", "r", encoding="utf-8") as f:
+        with open("game/Game_Files/JSON/cleaned_world.json", "r", encoding="utf-8") as f:
             self.world = json.load(f)
 
         # Stores all polygon IDs for each country

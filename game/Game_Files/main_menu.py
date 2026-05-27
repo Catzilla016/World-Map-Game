@@ -1,7 +1,7 @@
 import tkinter as tk
 
 
-class main():
+class MainMenu():
     def __int__(self):
         pass
     

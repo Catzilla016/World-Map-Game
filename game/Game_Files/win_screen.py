@@ -12,5 +12,5 @@ class WinScreen(tk.Frame):
     
     def main(self):
         self.back_button.pack()
-
-        self.root.mainloop()
+    
+        

@@ -10,7 +10,7 @@ class App(tk.Tk):
 
         super().__init__()
 
-        self.geometry("600x400")
+        self.geometry("1400x800")
 
         container = tk.Frame(self)
         container.pack(fill="both", expand=True)
