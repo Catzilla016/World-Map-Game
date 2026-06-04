@@ -30,6 +30,13 @@ class GameMode1(tk.Frame):
             bg="lightblue"
         )
 
+        self.country_count_label = tk.Label(
+            self,
+            text=""
+        )
+
+        self.country_count = 195
+
         self.country_names =['Afghanistan',
         'Albania',
         'Algeria',
@@ -454,6 +461,7 @@ class GameMode1(tk.Frame):
             )
 
             self.label.config(text="")
+            self.country_count += 1
             print(country_name)
 
         # Close matches
@@ -476,8 +484,8 @@ class GameMode1(tk.Frame):
                 self.label.config(
                     text="Country not found"
                 )
+        
+        if self.country_count >= 197:
+            self.app.show_frame("WinScreen")
 
         self.entry.delete(0, tk.END)
-
-
-        
