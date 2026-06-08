@@ -1,7 +1,10 @@
 import tkinter as tk
 
-from game_mode1 import *
+from game_mode_normal import *
 from win_screen import *
+from game_mode_timed import *
+from game_mode_border import *
+from main_menu import *
 
 
 class App(tk.Tk):
@@ -18,7 +21,7 @@ class App(tk.Tk):
         self.frames = {}
 
         # Create all screens
-        for FrameClass in (GameMode1, WinScreen):
+        for FrameClass in (GameMode1, GameMode2, GameMode3, WinScreen, MainMenu):
 
             frame = FrameClass(container, self)
 
@@ -30,11 +33,14 @@ class App(tk.Tk):
 
             frame.grid(row=0, column=0, sticky="nsew")
 
-        self.show_frame("GameMode1")
+        self.show_frame("MainMenu")
 
-    def show_frame(self, name):
+    def show_frame(self, name, time=None):
 
         frame = self.frames[name]
+        
+        if name == "WinScreen" and time is not None:
+            frame.set_time(time)
 
         frame.tkraise()
     

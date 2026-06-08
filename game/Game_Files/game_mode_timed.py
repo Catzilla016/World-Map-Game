@@ -2,38 +2,82 @@ import tkinter as tk
 import json
 import difflib
 
-class GameMode1(tk.Frame):
+class GameMode2(tk.Frame):
     def __init__(self, parent, app):
-
         super().__init__(parent)
 
         self.app = app
+        self.app.title("Country Guessr")
+
+        self.configure(bg="#1b1f2a")
 
         self.WIDTH = 1400
         self.HEIGHT = 800
+        
+        self.seconds = 0
+        self.game_running = True
 
-        self.button = tk.Button(
-            self,
-            text="Submit",
-            width=25,
-            command=self.on_button_click
+        button_style = {
+            "font": ("Arial", 12),
+            "bg": "#2d3445",
+            "fg": "white",
+            "activebackground": "#3e4a66",
+            "activeforeground": "white",
+            "bd": 0,
+            "cursor": "hand2",
+            "width": 12
+        }
+
+        label_style = {
+            "font": ("Arial", 12),
+            "bg": "#1b1f2a",
+            "fg": "white"
+        }
+        
+        # ---------- TOP BAR ----------
+        self.top_bar = tk.Frame(self, bg="#1b1f2a")
+        self.top_bar.pack(fill="x", pady=10)
+
+        self.back_button = tk.Button(
+            self.top_bar,
+            text="Back",
+            command=lambda: app.show_frame("MainMenu"),
+            **button_style
         )
+        self.back_button.pack(side="left", padx=10)
 
-        self.entry = tk.Entry(self)
+        self.timer_label = tk.Label(self.top_bar, text="0:00", **label_style)
+        self.timer_label.pack(side="right", padx=20)
 
-        self.label = tk.Label(self, text="")
-
+        # ---------- CANVAS ----------
         self.canvas = tk.Canvas(
             self,
             width=self.WIDTH,
             height=self.HEIGHT,
-            bg="lightblue"
+            bg="#cfe8ff",
+            highlightthickness=2,
+            highlightbackground="#2d3445"
         )
+        self.canvas.pack(pady=10)
 
-        self.country_count_label = tk.Label(
-            self,
-            text=""
+        # ---------- INPUT ----------
+        self.bottom_bar = tk.Frame(self, bg="#1b1f2a")
+        self.bottom_bar.pack(pady=10)
+
+        self.entry = tk.Entry(self.bottom_bar, font=("Arial", 14), width=30)
+        self.entry.pack(side="left", padx=10)
+
+        self.button = tk.Button(
+            self.bottom_bar,
+            text="Submit",
+            command=self.on_button_click,
+            **button_style
         )
+        self.button.pack(side="left")
+
+        # ---------- LABEL ----------
+        self.label = tk.Label(self, text="", **label_style)
+        self.label.pack(pady=5)
 
         self.country_count = 195
 
@@ -286,6 +330,7 @@ class GameMode1(tk.Frame):
         self.button.pack()
         self.entry.pack()
         self.label.pack()
+        self.timer_label.pack()
 
         #Load the JSON
         with open("game/Game_Files/JSON/cleaned_world.json", "r", encoding="utf-8") as f:
@@ -316,7 +361,9 @@ class GameMode1(tk.Frame):
 
             self.country_dots[country_name] = dot_id
         
-        self.bind("<Return>", self.on_button_click)
+        self.update_timer()
+        
+        self.entry.bind("<Return>", self.on_button_click)
             
 
     def project(self, lon, lat):
@@ -448,9 +495,10 @@ class GameMode1(tk.Frame):
             country_name
         )
         
-        country_name = country_name[0].upper() + country_name[1:]
+        country_name = country_name.strip().lower()
+        country_name = self.aliases.get(country_name, country_name)
 
-        # Exact match
+        #Exact match
         if country_name in self.country_names:
 
             self.fill_country(country_name, "red")
@@ -464,7 +512,7 @@ class GameMode1(tk.Frame):
             self.country_count += 1
             print(country_name)
 
-        # Close matches
+        #Close matches
         else:
             matches = difflib.get_close_matches(
                 country_name,
@@ -486,6 +534,21 @@ class GameMode1(tk.Frame):
                 )
         
         if self.country_count >= 197:
-            self.app.show_frame("WinScreen")
+            self.game_running = False
+            self.app.show_frame("WinScreen", time=self.seconds)
 
         self.entry.delete(0, tk.END)
+
+
+    def update_timer(self):
+        if self.game_running:
+            self.seconds += 1
+
+            minutes = self.seconds // 60
+            seconds = self.seconds % 60
+
+            self.timer_label.config(
+                text=f"{minutes}:{seconds:02d}"
+            )
+
+            self.after(1000, self.update_timer)
