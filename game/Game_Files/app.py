@@ -18,6 +18,14 @@ class App(tk.Tk):
         container = tk.Frame(self)
         container.pack(fill="both", expand=True)
 
+        self.frame_classes = {
+            "GameMode1": GameMode1,
+            "GameMode2": GameMode2,
+            "GameMode3": GameMode3,
+            "WinScreen": WinScreen,
+            "MainMenu": MainMenu
+        }
+
         self.frames = {}
 
         # Create all screens
@@ -45,13 +53,14 @@ class App(tk.Tk):
         frame.tkraise()
     
     def reset_frame(self, name):
-        # Remove old game frame
         self.frames[name].destroy()
 
-        # Create new game frame
         container = next(iter(self.frames.values())).master
 
-        frame = GameMode1(container, self)
+        FrameClass = self.frame_classes[name]
+
+        frame = FrameClass(container, self)
+
         self.frames[name] = frame
 
         frame.grid(row=0, column=0, sticky="nsew")

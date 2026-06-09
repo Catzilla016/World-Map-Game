@@ -1,6 +1,7 @@
 import tkinter as tk
 import json
 import difflib
+from resource_path import resource_path
 
 class GameMode1(tk.Frame):
     def __init__(self, parent, app):
@@ -12,7 +13,7 @@ class GameMode1(tk.Frame):
         self.configure(bg="#1b1f2a")
 
         self.WIDTH = 1400
-        self.HEIGHT = 800
+        self.HEIGHT = 750
         
 
         button_style = {
@@ -31,6 +32,18 @@ class GameMode1(tk.Frame):
             "bg": "#1b1f2a",
             "fg": "white"
         }
+
+        # ---------- TOP BAR ----------
+        self.top_bar = tk.Frame(self, bg="#1b1f2a")
+        self.top_bar.pack(fill="x", pady=10)
+
+        self.back_button = tk.Button(
+            self.top_bar,
+            text="Back",
+            command=lambda: app.show_frame("MainMenu"),
+            **button_style
+        )
+        self.back_button.pack(side="left", padx=10)
 
         # ---------- CANVAS ----------
         self.canvas = tk.Canvas(
@@ -62,7 +75,7 @@ class GameMode1(tk.Frame):
         self.label = tk.Label(self, text="", **label_style)
         self.label.pack(pady=5)
 
-        self.country_count = 195
+        self.country_count = 0
 
         self.country_names =['Afghanistan',
         'Albania',
@@ -282,7 +295,6 @@ class GameMode1(tk.Frame):
             "United States of America" : "USA"
         }
         
-        #TODO ADD MORE ALIASES!!!!
         self.aliases = {
             "usa": "USA",
             "united states": "USA",
@@ -302,20 +314,48 @@ class GameMode1(tk.Frame):
             "democratic republic of the congo": "Dem. Rep. Congo",
             "drc": "Dem. Rep. Congo", 
 
-            "uae": "United Arab Emirates"
+            "uae": "United Arab Emirates",
+
+            "afganistan": "Afghanistan",
+
+            "sao tome": "Sao Tome and Principe",
+
+            "st vincent": "St. Vincent and the Grenadines",
+            "st kitts": "St. Kitts and Nevis",
+            "st lucia": "St. Lucia",
+            "barbuda": "Antigua and Barbuda",
+            "antigua": "Antigua and Barbuda",
+
+            "bosnia": "Bosnia and Herzegovina",
+
+            "car": "Central African Republic",
+
+            "drc": "Dem. Rep. Congo",
+
+            "kazakstan": "Kazakhstan",
+
+            "kyrgystan": "Kyrgyzstan",
+
+            "new guinea": "Papua New Guinea",
+            
+            "east timor": "Timor-Leste",
+
+            "cape verde": "Cabo Verde",
+
+            "dr": "Dominican Republic"
         }
         
         self.country_dots = {}
 
 
     def main(self):
-        self.canvas.pack()
-        self.button.pack()
-        self.entry.pack()
-        self.label.pack()
 
         #Load the JSON
-        with open("game/Game_Files/JSON/cleaned_world.json", "r", encoding="utf-8") as f:
+        with open(
+        resource_path("game/Game_Files/JSON/cleaned_world.json"),
+        "r",
+        encoding="utf-8"
+        ) as f:
             self.world = json.load(f)
 
         # Stores all polygon IDs for each country
@@ -330,7 +370,7 @@ class GameMode1(tk.Frame):
             dot_id = self.canvas.create_oval(
                 x - 2, y - 2,
                 x + 2, y + 2,
-                fill="red",
+                fill="blue",
                 outline=""
             )
 
@@ -475,8 +515,7 @@ class GameMode1(tk.Frame):
             country_name
         )
         
-        country_name = country_name.strip().lower()
-        country_name = self.aliases.get(country_name, country_name)
+        country_name = country_name[0].upper() + country_name[1:]
 
         # Exact match
         if country_name in self.country_names:

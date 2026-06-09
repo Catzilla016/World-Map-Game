@@ -67,10 +67,13 @@ class MainMenu(tk.Frame):
         
 
     def game_mode_normal_func(self):
+        self.app.reset_frame("GameMode1")
         self.app.show_frame("GameMode1")
 
     def game_mode_timed_func(self):
+        self.app.reset_frame("GameMode2")
         self.app.show_frame("GameMode2")
 
     def game_mode_border_func(self):
+        self.app.reset_frame("GameMode3")
         self.app.show_frame("GameMode3")
