@@ -292,7 +292,7 @@ class GameMode1(tk.Frame):
             "São Tomé and Principe": "Sao Tome and Principe",
             "Solomon Is.": "Solomon Islands",
             "S. Sudan": "South Sudan",
-            "United States of America" : "USA"
+            "United States of America" : "USA",
         }
         
         self.aliases = {
@@ -325,6 +325,12 @@ class GameMode1(tk.Frame):
             "st lucia": "St. Lucia",
             "barbuda": "Antigua and Barbuda",
             "antigua": "Antigua and Barbuda",
+            "trinidad": "Trinidad and Tobago",
+            "tobago": "Trinidad and Tobago",
+            
+            "costa rica": "Costa Rica",
+            
+            "el salvador": "El Salvador",
 
             "bosnia": "Bosnia and Herzegovina",
 

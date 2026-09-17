@@ -50,7 +50,7 @@ class GameMode2(tk.Frame):
         self.timer_label = tk.Label(self.top_bar, text="0:00", **label_style)
         self.timer_label.pack(side="right", padx=20)
 
-        self.country_num = tk.Label(self.top_bar, text="0/197" **label_style)
+        self.country_num = tk.Label(self.top_bar, text="0/197", **label_style)
 
         # ---------- CANVAS ----------
         self.canvas = tk.Canvas(
